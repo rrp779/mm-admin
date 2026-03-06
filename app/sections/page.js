@@ -205,6 +205,7 @@ title:product.title,
 productId:product.id,
 productTitle:product.title,
 productImage:product.image,
+price:product.price || "",
 video:"",
 thumbnail:product.image,
 visible:true
@@ -259,20 +260,6 @@ const removeItem = async(section,index)=>{
 const updated = section.items.filter((_,i)=>i!==index)
 
 await updateSection(section._id,{items:updated})
-
-}
-
-/* ================= IMAGE RESOLVER ================= */
-
-const getItemImage = (item) => {
-
-return (
-item.image ||
-item.thumbnail ||
-item.productImage ||
-item.collectionImage ||
-""
-)
 
 }
 
@@ -335,6 +322,8 @@ className="border px-2 py-1 font-bold"
 <button onClick={()=>moveSection(index,"up")}>↑</button>
 <button onClick={()=>moveSection(index,"down")}>↓</button>
 
+{/* GRADIENT */}
+
 <input
 type="color"
 value={section.settings?.gradientStart || ""}
@@ -349,6 +338,39 @@ value={section.settings?.gradientEnd || ""}
 onChange={(e)=>updateSection(section._id,{
 settings:{...section.settings,gradientEnd:e.target.value}
 })}
+/>
+
+{/* BACKGROUND IMAGE */}
+
+<input
+type="file"
+accept="image/*"
+
+onChange={async(e)=>{
+
+const file = e.target.files[0]
+if(!file) return
+
+const formData = new FormData()
+formData.append("image",file)
+
+const res = await fetch(`${API}/upload`,{
+method:"POST",
+body:formData
+})
+
+const data = await res.json()
+
+await updateSection(section._id,{
+settings:{
+...section.settings,
+backgroundImage:data.imageUrl
+}
+})
+
+}}
+
+className="text-xs"
 />
 
 <select
@@ -400,7 +422,11 @@ className="absolute top-2 right-2 text-red-500"
 
 </button>
 
-{section.type==="reels_section" && item.video ? (
+{/* PREVIEW */}
+
+{section.type==="reels_section" ? (
+
+item.video ? (
 
 <video
 src={item.video}
@@ -411,7 +437,16 @@ controls
 ) : (
 
 <img
-src={getItemImage(item)}
+src={item.thumbnail || item.productImage || item.collectionImage}
+className="w-full h-36 object-cover rounded mb-2"
+/>
+
+)
+
+) : (
+
+<img
+src={item.image || item.productImage || item.collectionImage}
 className="w-full h-36 object-cover rounded mb-2"
 />
 
@@ -420,6 +455,73 @@ className="w-full h-36 object-cover rounded mb-2"
 <p className="text-xs font-semibold">
 {item.title || item.productTitle || item.collectionTitle}
 </p>
+
+{/* UPLOAD */}
+
+{section.type==="reels_section" ? (
+
+<input
+type="file"
+accept="video/*"
+className="mt-2 text-xs"
+
+onChange={async(e)=>{
+
+const file = e.target.files[0]
+if(!file) return
+
+const formData = new FormData()
+formData.append("video",file)
+
+const res = await fetch(`${API}/upload-video`,{
+method:"POST",
+body:formData
+})
+
+const data = await res.json()
+
+const updated=[...section.items]
+
+updated[i].video = data.videoUrl
+updated[i].thumbnail = ""
+
+await updateSection(section._id,{items:updated})
+
+}}
+/>
+
+) : (
+
+<input
+type="file"
+accept="image/*"
+className="mt-2 text-xs"
+
+onChange={async(e)=>{
+
+const file = e.target.files[0]
+if(!file) return
+
+const formData = new FormData()
+formData.append("image",file)
+
+const res = await fetch(`${API}/upload`,{
+method:"POST",
+body:formData
+})
+
+const data = await res.json()
+
+const updated=[...section.items]
+
+updated[i].image = data.imageUrl
+
+await updateSection(section._id,{items:updated})
+
+}}
+/>
+
+)}
 
 </div>
 
@@ -440,7 +542,7 @@ className="mt-4 bg-black text-white px-4 py-2 rounded"
 
 ))}
 
-{/* ================= MODAL ================= */}
+{/* MODAL */}
 
 {pickerSection && (
 
