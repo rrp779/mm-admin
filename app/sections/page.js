@@ -12,7 +12,6 @@ const [pickerSection,setPickerSection] = useState(null);
 const [searchQuery,setSearchQuery] = useState("");
 const [searchResults,setSearchResults] = useState([]);
 const [isSearching,setIsSearching] = useState(false);
-
 const [searchType,setSearchType] = useState("product");
 
 const searchTimeout = useRef(null);
@@ -157,7 +156,7 @@ fetchSections()
 
 }
 
-/* ================= PRODUCT / COLLECTION SEARCH ================= */
+/* ================= SEARCH PRODUCTS / COLLECTIONS ================= */
 
 const fetchSearch = async(query)=>{
 
@@ -191,7 +190,7 @@ setIsSearching(false)
 
 }
 
-/* ================= ADD PRODUCT REEL ================= */
+/* ================= ADD REEL PRODUCT ================= */
 
 const addReelProduct = async(product)=>{
 
@@ -222,7 +221,7 @@ setPickerSection(null)
 
 }
 
-/* ================= ADD COLLECTION REEL ================= */
+/* ================= ADD REEL COLLECTION ================= */
 
 const addReelCollection = async(collection)=>{
 
@@ -329,14 +328,16 @@ className="border px-2 py-1"
 onClick={()=>deleteSection(section._id)}
 className="text-red-500"
 >
+
 Delete
+
 </button>
 
 </div>
 
 </div>
 
-{/* ================= REELS ITEMS ================= */}
+{/* ================= ITEMS ================= */}
 
 <div className="grid grid-cols-4 gap-4">
 
@@ -354,7 +355,11 @@ className="absolute top-2 right-2 text-red-500"
 ✕
 </button>
 
-{item.video ? (
+{/* ================= PREVIEW ================= */}
+
+{section.type==="reels_section" ? (
+
+item.video ? (
 
 <video
 src={item.video}
@@ -369,12 +374,57 @@ src={item.thumbnail}
 className="w-full h-36 object-cover rounded mb-2"
 />
 
+)
+
+) : (
+
+<img
+src={item.image}
+className="w-full h-36 object-cover rounded mb-2"
+/>
+
 )}
+
+{/* ================= PRODUCT PREVIEW ================= */}
+
+{item.productImage && (
+
+<div className="bg-gray-100 p-2 rounded">
+
+<div className="flex items-center gap-2">
+
+<img
+src={item.productImage}
+className="w-8 h-8 object-cover rounded"
+/>
+
+<div>
+
+<p className="text-xs font-semibold">
+{item.productTitle}
+</p>
+
+<p className="text-xs text-pink-600">
+₹ {item.price}
+</p>
+
+</div>
+
+</div>
+
+</div>
+
+)}
+
+{/* ================= UPLOAD ================= */}
+
+{section.type==="reels_section" ? (
 
 <input
 type="file"
 accept="video/*"
 className="mt-2 text-xs"
+
 onChange={async(e)=>{
 
 const file = e.target.files[0]
@@ -391,6 +441,7 @@ body:formData
 const data = await res.json()
 
 const updated=[...section.items]
+
 updated[i].video = data.videoUrl
 updated[i].thumbnail = ""
 
@@ -398,6 +449,39 @@ await updateSection(section._id,{items:updated})
 
 }}
 />
+
+) : (
+
+<input
+type="file"
+accept="image/*"
+className="mt-2 text-xs"
+
+onChange={async(e)=>{
+
+const file = e.target.files[0]
+if(!file) return
+
+const formData = new FormData()
+formData.append("image",file)
+
+const res = await fetch(`${API}/upload`,{
+method:"POST",
+body:formData
+})
+
+const data = await res.json()
+
+const updated=[...section.items]
+
+updated[i].image = data.imageUrl
+
+await updateSection(section._id,{items:updated})
+
+}}
+/>
+
+)}
 
 </div>
 
@@ -430,8 +514,6 @@ className="mt-4 bg-black text-white px-4 py-2 rounded"
 Select Product / Collection
 </h2>
 
-{/* TYPE SWITCH */}
-
 <div className="flex gap-3 mb-4">
 
 <button
@@ -462,6 +544,7 @@ Collections
 type="text"
 placeholder="Search..."
 value={searchQuery}
+
 onChange={(e)=>{
 
 const value = e.target.value
@@ -476,6 +559,7 @@ fetchSearch(value)
 },400)
 
 }}
+
 className="border px-3 py-2 w-full rounded"
 />
 
@@ -491,6 +575,7 @@ className="border px-3 py-2 w-full rounded"
 
 <div
 key={item.id}
+
 onClick={()=>{
 
 if(searchType==="product"){
@@ -500,6 +585,7 @@ addReelCollection(item)
 }
 
 }}
+
 className="border p-3 rounded cursor-pointer hover:bg-gray-100"
 >
 
