@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 
-const API = "http://192.168.31.143:5500/api";
+const API = "https://mm-backend-production-f67e.up.railway.app/api";
 
 export default function SectionsPage() {
 
