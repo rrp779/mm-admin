@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import React from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,16 +13,21 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "MM Admin Panel",
-  description: "Makeup Mystery Admin"
+  description: "Makeup Mystery Admin",
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <body className="bg-gray-100">
         <div className="flex min-h-screen">
+          
           {/* Sidebar */}
           <div className="w-64 bg-black text-white p-5">
             <h2 className="text-xl font-bold mb-6">
@@ -39,6 +45,7 @@ export default function RootLayout({ children }) {
           <div className="flex-1 p-8">
             {children}
           </div>
+
         </div>
       </body>
     </html>
