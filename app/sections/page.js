@@ -13,6 +13,8 @@ const [searchQuery,setSearchQuery] = useState("");
 const [searchResults,setSearchResults] = useState([]);
 const [isSearching,setIsSearching] = useState(false);
 
+const [searchType,setSearchType] = useState("product");
+
 const searchTimeout = useRef(null);
 
 /* ================= FETCH SECTIONS ================= */
@@ -155,7 +157,7 @@ fetchSections()
 
 }
 
-/* ================= PRODUCT SEARCH ================= */
+/* ================= PRODUCT / COLLECTION SEARCH ================= */
 
 const fetchSearch = async(query)=>{
 
@@ -169,7 +171,7 @@ try{
 setIsSearching(true)
 
 const res = await fetch(
-`${API}/shopify/search?type=product&q=${query}`
+`${API}/shopify/search?type=${searchType}&q=${query}`
 )
 
 const data = await res.json()
@@ -189,7 +191,7 @@ setIsSearching(false)
 
 }
 
-/* ================= ADD REEL PRODUCT ================= */
+/* ================= ADD PRODUCT REEL ================= */
 
 const addReelProduct = async(product)=>{
 
@@ -206,6 +208,36 @@ productImage:product.image,
 price:product.price || "",
 video:"",
 thumbnail:product.image,
+visible:true
+}
+
+]
+
+await updateSection(
+pickerSection._id,
+{items:updatedItems}
+)
+
+setPickerSection(null)
+
+}
+
+/* ================= ADD COLLECTION REEL ================= */
+
+const addReelCollection = async(collection)=>{
+
+if(!pickerSection) return
+
+const updatedItems = [
+
+...pickerSection.items,
+
+{
+collectionId:collection.id,
+collectionTitle:collection.title,
+collectionImage:collection.image,
+video:"",
+thumbnail:collection.image,
 visible:true
 }
 
@@ -245,12 +277,11 @@ Sections Manager
 <button
 onClick={addSection}
 className="bg-black text-white px-4 py-2 rounded"
-
 >
 
-* Add Section
++ Add Section
 
-  </button>
+</button>
 
 </div>
 
@@ -278,51 +309,10 @@ className="border px-2 py-1 font-bold"
 <button onClick={()=>moveSection(index,"up")}>↑</button>
 <button onClick={()=>moveSection(index,"down")}>↓</button>
 
-{/* GRADIENT COLORS */}
-
-<input
-type="color"
-value={section.settings?.gradientStart || ""}
-onChange={(e)=>updateSection(section._id,{
-settings:{...section.settings,gradientStart:e.target.value}
-})}
-/>
-
-<input
-type="color"
-value={section.settings?.gradientEnd || ""}
-onChange={(e)=>updateSection(section._id,{
-settings:{...section.settings,gradientEnd:e.target.value}
-})}
-/>
-
-{/* PADDING */}
-
-<input
-type="number"
-value={section.settings?.paddingTop || 16}
-onChange={(e)=>updateSection(section._id,{
-settings:{...section.settings,paddingTop:Number(e.target.value)}
-})}
-className="w-16 border px-1"
-/>
-
-<input
-type="number"
-value={section.settings?.paddingBottom || 16}
-onChange={(e)=>updateSection(section._id,{
-settings:{...section.settings,paddingBottom:Number(e.target.value)}
-})}
-className="w-16 border px-1"
-/>
-
-{/* TYPE */}
-
 <select
 value={section.type}
 onChange={(e)=>updateSection(section._id,{type:e.target.value})}
 className="border px-2 py-1"
-
 >
 
 <option value="hero">Hero</option>
@@ -338,10 +328,9 @@ className="border px-2 py-1"
 <button
 onClick={()=>deleteSection(section._id)}
 className="text-red-500"
-
 >
-
-Delete </button>
+Delete
+</button>
 
 </div>
 
@@ -361,12 +350,9 @@ className="border p-3 rounded relative"
 <button
 onClick={()=>removeItem(section,i)}
 className="absolute top-2 right-2 text-red-500"
-
 >
-
-✕ </button>
-
-{/* VIDEO PREVIEW */}
+✕
+</button>
 
 {item.video ? (
 
@@ -385,47 +371,16 @@ className="w-full h-36 object-cover rounded mb-2"
 
 )}
 
-{/* PRODUCT PREVIEW */}
-
-<div className="bg-gray-100 p-2 rounded">
-
-<div className="flex items-center gap-2">
-
-<img
-src={item.productImage}
-className="w-8 h-8 object-cover rounded"
-/>
-
-<div>
-
-<p className="text-xs font-semibold">
-{item.productTitle}
-</p>
-
-<p className="text-xs text-pink-600">
-₹ {item.price}
-</p>
-
-</div>
-
-</div>
-
-</div>
-
-{/* VIDEO UPLOAD */}
-
 <input
 type="file"
 accept="video/*"
 className="mt-2 text-xs"
-
 onChange={async(e)=>{
 
 const file = e.target.files[0]
 if(!file) return
 
 const formData = new FormData()
-
 formData.append("video",file)
 
 const res = await fetch(`${API}/upload-video`,{
@@ -436,7 +391,6 @@ body:formData
 const data = await res.json()
 
 const updated=[...section.items]
-
 updated[i].video = data.videoUrl
 updated[i].thumbnail = ""
 
@@ -454,18 +408,17 @@ await updateSection(section._id,{items:updated})
 <button
 onClick={()=>setPickerSection(section)}
 className="mt-4 bg-black text-white px-4 py-2 rounded"
-
 >
 
-* Add Reel Product
++ Add Reel Product / Collection
 
-  </button>
+</button>
 
 </div>
 
 ))}
 
-{/* ================= PRODUCT MODAL ================= */}
+{/* ================= PRODUCT / COLLECTION MODAL ================= */}
 
 {pickerSection && (
 
@@ -474,14 +427,41 @@ className="mt-4 bg-black text-white px-4 py-2 rounded"
 <div className="bg-white p-6 w-[700px] rounded max-h-[85vh] overflow-y-auto">
 
 <h2 className="font-bold mb-4 text-lg">
-Select Product
+Select Product / Collection
 </h2>
+
+{/* TYPE SWITCH */}
+
+<div className="flex gap-3 mb-4">
+
+<button
+onClick={()=>setSearchType("product")}
+className={`px-3 py-1 rounded ${
+searchType==="product"
+? "bg-black text-white"
+: "bg-gray-200"
+}`}
+>
+Products
+</button>
+
+<button
+onClick={()=>setSearchType("collection")}
+className={`px-3 py-1 rounded ${
+searchType==="collection"
+? "bg-black text-white"
+: "bg-gray-200"
+}`}
+>
+Collections
+</button>
+
+</div>
 
 <input
 type="text"
-placeholder="Search product..."
+placeholder="Search..."
 value={searchQuery}
-
 onChange={(e)=>{
 
 const value = e.target.value
@@ -496,7 +476,6 @@ fetchSearch(value)
 },400)
 
 }}
-
 className="border px-3 py-2 w-full rounded"
 />
 
@@ -508,25 +487,29 @@ className="border px-3 py-2 w-full rounded"
 
 <div className="grid grid-cols-3 gap-4 mt-4">
 
-{searchResults.map((product)=>(
+{searchResults.map((item)=>(
 
 <div
-key={product.id}
-onClick={()=>addReelProduct(product)}
+key={item.id}
+onClick={()=>{
+
+if(searchType==="product"){
+addReelProduct(item)
+}else{
+addReelCollection(item)
+}
+
+}}
 className="border p-3 rounded cursor-pointer hover:bg-gray-100"
 >
 
 <img
-src={product.image}
+src={item.image}
 className="w-full h-28 object-cover mb-2 rounded"
 />
 
 <p className="text-sm">
-{product.title}
-</p>
-
-<p className="text-xs text-pink-600">
-₹ {product.price}
+{item.title}
 </p>
 
 </div>
@@ -540,10 +523,11 @@ className="w-full h-28 object-cover mb-2 rounded"
 <button
 onClick={()=>setPickerSection(null)}
 className="mt-6 bg-red-500 text-white px-4 py-2 rounded"
-
 >
 
-Close </button>
+Close
+
+</button>
 
 </div>
 
