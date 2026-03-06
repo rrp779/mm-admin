@@ -135,15 +135,15 @@ settings:{
 layout:"column",
 columns:4,
 backgroundColor:"#ffffff",
-paddingTop:16,
-paddingBottom:16,
-sliderStyle:"small",
 gradientStart:"",
 gradientEnd:"",
 backgroundImage:"",
 overlayOpacity:0,
+paddingTop:16,
+paddingBottom:16,
 containerWidth:"full",
-borderRadius:0
+borderRadius:0,
+sliderStyle:"small"
 },
 
 items:[]
@@ -190,7 +190,7 @@ setIsSearching(false)
 
 }
 
-/* ================= ADD REEL PRODUCT ================= */
+/* ================= ADD PRODUCT ================= */
 
 const addReelProduct = async(product)=>{
 
@@ -201,6 +201,7 @@ const updatedItems = [
 ...pickerSection.items,
 
 {
+title:product.title,
 productId:product.id,
 productTitle:product.title,
 productImage:product.image,
@@ -221,7 +222,7 @@ setPickerSection(null)
 
 }
 
-/* ================= ADD REEL COLLECTION ================= */
+/* ================= ADD COLLECTION ================= */
 
 const addReelCollection = async(collection)=>{
 
@@ -232,6 +233,7 @@ const updatedItems = [
 ...pickerSection.items,
 
 {
+title:collection.title,
 collectionId:collection.id,
 collectionTitle:collection.title,
 collectionImage:collection.image,
@@ -290,7 +292,19 @@ className="bg-black text-white px-4 py-2 rounded"
 
 <div
 key={section._id}
-className="bg-white p-6 shadow rounded mb-6"
+className="p-6 shadow rounded mb-6"
+style={{
+background: section.settings?.gradientStart && section.settings?.gradientEnd
+? `linear-gradient(90deg, ${section.settings.gradientStart}, ${section.settings.gradientEnd})`
+: section.settings?.backgroundColor,
+
+backgroundImage: section.settings?.backgroundImage
+? `url(${section.settings.backgroundImage})`
+: "none",
+
+backgroundSize:"cover",
+backgroundPosition:"center"
+}}
 >
 
 {/* HEADER */}
@@ -307,6 +321,57 @@ className="border px-2 py-1 font-bold"
 
 <button onClick={()=>moveSection(index,"up")}>↑</button>
 <button onClick={()=>moveSection(index,"down")}>↓</button>
+
+{/* GRADIENT */}
+
+<input
+type="color"
+value={section.settings?.gradientStart || ""}
+onChange={(e)=>updateSection(section._id,{
+settings:{...section.settings,gradientStart:e.target.value}
+})}
+/>
+
+<input
+type="color"
+value={section.settings?.gradientEnd || ""}
+onChange={(e)=>updateSection(section._id,{
+settings:{...section.settings,gradientEnd:e.target.value}
+})}
+/>
+
+{/* BACKGROUND IMAGE */}
+
+<input
+type="file"
+accept="image/*"
+
+onChange={async(e)=>{
+
+const file = e.target.files[0]
+if(!file) return
+
+const formData = new FormData()
+formData.append("image",file)
+
+const res = await fetch(`${API}/upload`,{
+method:"POST",
+body:formData
+})
+
+const data = await res.json()
+
+await updateSection(section._id,{
+settings:{
+...section.settings,
+backgroundImage:data.imageUrl
+}
+})
+
+}}
+
+className="text-xs"
+/>
 
 <select
 value={section.type}
@@ -337,7 +402,7 @@ Delete
 
 </div>
 
-{/* ================= ITEMS ================= */}
+{/* ITEMS */}
 
 <div className="grid grid-cols-4 gap-4">
 
@@ -352,10 +417,12 @@ className="border p-3 rounded relative"
 onClick={()=>removeItem(section,i)}
 className="absolute top-2 right-2 text-red-500"
 >
+
 ✕
+
 </button>
 
-{/* ================= PREVIEW ================= */}
+{/* PREVIEW */}
 
 {section.type==="reels_section" ? (
 
@@ -367,10 +434,10 @@ className="w-full h-36 object-cover rounded mb-2"
 controls
 />
 
-):(
+) : (
 
 <img
-src={item.thumbnail}
+src={item.thumbnail || item.productImage || item.collectionImage}
 className="w-full h-36 object-cover rounded mb-2"
 />
 
@@ -379,44 +446,17 @@ className="w-full h-36 object-cover rounded mb-2"
 ) : (
 
 <img
-src={item.image}
+src={item.image || item.productImage || item.collectionImage}
 className="w-full h-36 object-cover rounded mb-2"
 />
 
 )}
 
-{/* ================= PRODUCT PREVIEW ================= */}
-
-{item.productImage && (
-
-<div className="bg-gray-100 p-2 rounded">
-
-<div className="flex items-center gap-2">
-
-<img
-src={item.productImage}
-className="w-8 h-8 object-cover rounded"
-/>
-
-<div>
-
 <p className="text-xs font-semibold">
-{item.productTitle}
+{item.title || item.productTitle || item.collectionTitle}
 </p>
 
-<p className="text-xs text-pink-600">
-₹ {item.price}
-</p>
-
-</div>
-
-</div>
-
-</div>
-
-)}
-
-{/* ================= UPLOAD ================= */}
+{/* UPLOAD */}
 
 {section.type==="reels_section" ? (
 
@@ -502,7 +542,7 @@ className="mt-4 bg-black text-white px-4 py-2 rounded"
 
 ))}
 
-{/* ================= PRODUCT / COLLECTION MODAL ================= */}
+{/* MODAL */}
 
 {pickerSection && (
 
