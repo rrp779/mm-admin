@@ -27,7 +27,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="bg-gray-100">
         <div className="flex min-h-screen">
-          
+
           {/* Sidebar */}
           <div className="w-64 bg-black text-white p-5">
             <h2 className="text-xl font-bold mb-6">
