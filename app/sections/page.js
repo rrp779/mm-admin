@@ -49,12 +49,25 @@ fetchSections()
 const updateSection = async(id,data)=>{
 
 await fetch(`${API}/sections/${id}`,{
-method:"PUT",
-headers:{ "Content-Type":"application/json"},
-body:JSON.stringify(data)
+  method:"PUT",
+  headers:{ "Content-Type":"application/json"},
+  body:JSON.stringify(data)
 })
 
-fetchSections()
+// ✅ update UI without full reload
+setSections(prev =>
+  prev.map(s =>
+    s._id === id
+      ? {
+          ...s,
+          ...data,
+          settings: data.settings
+            ? { ...s.settings, ...data.settings }
+            : s.settings
+        }
+      : s
+  )
+)
 
 }
 
