@@ -439,24 +439,26 @@ Delete
 
 {/* ITEMS */}
 
-<div className={`${
-  section.type === "banner_slider"
-    ? "flex flex-col gap-4"
-    : section.type === "two_column_grid" &&
-      section.settings?.layoutStyle === "slider"
-    ? "flex gap-4 overflow-x-auto"
-    : "grid gap-4"
-} ${
-  section.type === "two_column_grid" &&
-  section.settings?.layoutStyle !== "slider"
-    ? "grid-cols-2"
-    : section.type === "collection_slider" &&
-      section.settings?.sliderStyle === "two_column"
-    ? "grid-cols-2"
-    : section.type === "banner_slider"
-    ? ""
-    : "grid-cols-4"
-}`}
+<div
+  className={`${
+    section.type === "banner_slider"
+      ? "flex flex-col gap-4"
+      : section.type === "two_column_grid" &&
+        section.settings?.layoutStyle === "slider"
+      ? "flex gap-4 overflow-x-auto"
+      : "grid gap-4"
+  } ${
+    section.type === "two_column_grid" &&
+    section.settings?.layoutStyle !== "slider"
+      ? "grid-cols-2"
+      : section.type === "collection_slider" &&
+        section.settings?.sliderStyle === "two_column"
+      ? "grid-cols-2"
+      : section.type === "banner_slider"
+      ? ""
+      : "grid-cols-4"
+  }`}
+>
 
 {section.items.map((item,i)=>(
 
