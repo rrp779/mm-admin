@@ -335,8 +335,13 @@ settings:{...section.settings,gradientStart:e.target.value}
 <input
 type="color"
 value={section.settings?.gradientEnd || ""}
-onChange={(e)=>updateSection(section._id,{
-settings:{...section.settings,gradientEnd:e.target.value}
+onChange={(e) =>
+  updateSection(section._id, {
+    settings: buildSafeSettings(section, {
+      sliderStyle: e.target.value,
+    }),
+  })
+}
 })}
 />
 
