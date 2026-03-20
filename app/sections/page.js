@@ -408,9 +408,9 @@ Delete
 
 <div className={`grid gap-4 ${
   section.type === "two_column_grid"
-    ? "grid-cols-2"
+    ? "grid-cols-4"
     : section.type === "banner_slider"
-    ? "grid-cols-1"
+    ? "grid-cols-4"
     : "grid-cols-4"
 }`}>
 
