@@ -419,7 +419,7 @@ Delete
 <div
   key={i}
   className={`border p-3 rounded relative ${
-    section.type === "banner_slider" ? "col-span-4" : ""
+    section.type === "banner_slider" ? ""
   }`}
 >
 
