@@ -408,6 +408,21 @@ className="border px-2 py-1"
 </select>
 )}
 
+{section.type === "two_column_grid" && (
+<select
+value={section.settings?.layoutStyle || "grid"}
+onChange={(e)=>updateSection(section._id,{
+settings:{
+...section.settings,
+layoutStyle:e.target.value
+}
+})}
+className="border px-2 py-1"
+>
+<option value="grid">2 Column Grid</option>
+<option value="slider">2 Column Slider</option>
+</select>
+)}
 
 <button
 onClick={()=>deleteSection(section._id)}
@@ -424,24 +439,30 @@ Delete
 
 {/* ITEMS */}
 
-<div className={`grid gap-4 ${
-  section.type === "two_column_grid"
+<div className={`${
+  section.type === "banner_slider"
+    ? "flex flex-col gap-4"
+    : section.type === "two_column_grid" &&
+      section.settings?.layoutStyle === "slider"
+    ? "flex gap-4 overflow-x-auto"
+    : "grid gap-4"
+} ${
+  section.type === "two_column_grid" &&
+  section.settings?.layoutStyle !== "slider"
     ? "grid-cols-2"
-    : section.type === "banner_slider"
-    ? "grid-cols-1"
     : section.type === "collection_slider" &&
       section.settings?.sliderStyle === "two_column"
     ? "grid-cols-2"
+    : section.type === "banner_slider"
+    ? ""
     : "grid-cols-4"
-}`}>
+}`}
 
 {section.items.map((item,i)=>(
 
 <div
   key={i}
-  className={`border p-3 rounded relative ${
-  section.type === "banner_slider" ? "" : ""
-}`}
+  className="border p-3 rounded relative"
 >
 
 <button
