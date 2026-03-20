@@ -391,8 +391,6 @@ className="border px-2 py-1"
 
 </select>
 
-{section.type === "collection_slider" && ( <select value={section.settings?.sliderStyle || "small"} onChange={(e) => updateSection(section._id, { settings: { ...section.settings, sliderStyle: e.target.value, }, }) } className="border px-2 py-1" > <option value="small">Column Slider</option> <option value="full">Full Width Slider</option> </select> )}
-
 <button
 onClick={()=>deleteSection(section._id)}
 className="text-red-500"
@@ -410,9 +408,12 @@ Delete
 
 <div className={`grid gap-4 ${
   section.type === "two_column_grid"
-    ? "grid-cols-4"
+    ? "grid-cols-2"
     : section.type === "banner_slider"
-    ? "grid-cols-4"
+    ? "grid-cols-1"
+    : section.type === "collection_slider" &&
+      section.settings?.sliderStyle === "two_column"
+    ? "grid-cols-2"
     : "grid-cols-4"
 }`}>
 
@@ -449,14 +450,16 @@ controls
 ) : (
 
 <img
-  src={item.image || item.productImage || item.collectionImage || item.thumbnail}
-  className={
-    section.type === "banner_slider"
-      ? "w-full h-64 object-cover rounded mb-2"
-      : section.type === "two_column_grid"
-      ? "w-full h-40 object-cover rounded mb-2"
-      : "w-full h-36 object-cover rounded mb-2"
-  }
+src={item.image || item.productImage || item.collectionImage || item.thumbnail}
+className={
+  section.type === "banner_slider"
+    ? "w-full h-64 object-cover rounded mb-2"
+    : section.type === "two_column_grid" ||
+      (section.type === "collection_slider" &&
+        section.settings?.sliderStyle === "two_column")
+    ? "w-full h-40 object-cover rounded mb-2"
+    : "w-full h-36 object-cover rounded mb-2"
+}
 />
 
 )
