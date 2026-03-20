@@ -476,7 +476,7 @@ Delete
 {section.items.map((item,i)=>(
 
 <div
-  key={i}
+  key={item._id || `${section._id}-${i}`}
   className="border p-3 rounded relative"
 >
 
@@ -572,32 +572,36 @@ await updateSection(section._id,{items:updated})
   accept="image/*"
   className="mt-2 text-xs"
   onChange={async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const file = e.target.files[0];
+  if (!file) return;
 
+  try {
     const formData = new FormData();
     formData.append("image", file);
 
-    try {
-      const res = await fetch(`${API}/upload`, {
-        method: "POST",
-        body: formData,
-      });
+    const res = await fetch(`${API}/upload`, {
+      method: "POST",
+      body: formData,
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      const updated = [...section.items];
-      updated[i] = {
-        ...updated[i],
-        image: data.imageUrl,
-      };
+    // ✅ update AFTER upload completes
+    const updated = [...section.items];
+    updated[i] = {
+      ...updated[i],
+      image: data.imageUrl,
+    };
 
-      await updateSection(section._id, { items: updated });
+    await updateSection(section._id, { items: updated });
 
-    } catch (err) {
-      console.error("Upload failed", err);
-    }
-  }}
+    // ✅ reset input (IMPORTANT)
+    e.target.value = "";
+
+  } catch (err) {
+    console.error("Upload failed", err);
+  }
+}}
 />
 )}
 
