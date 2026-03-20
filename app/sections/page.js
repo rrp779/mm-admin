@@ -277,15 +277,9 @@ Delete
 
 {/* ================= ITEMS ================= */}
 
-{/* TWO COLUMN */}
+{/* ================= ITEMS ================= */}
 
-<div className={
-  section.type === "two_column_grid"
-    ? "grid grid-cols-2 gap-4"
-    : section.type === "banner_slider"
-    ? "flex flex-col gap-4"
-    : "grid grid-cols-4 gap-4"
-}>
+{/* TWO COLUMN */}
 {section.type==="two_column_grid" && (
 <div className="grid grid-cols-2 gap-4">
 
@@ -405,6 +399,54 @@ await updateSection(section._id,{items:updated})
 )
 
 })}
+
+</div>
+)}
+
+{/* DEFAULT */}
+{section.type!=="two_column_grid" && section.type!=="banner_slider" && (
+<div className="grid grid-cols-4 gap-4">
+
+{section.items.map((item,i)=>(
+<div key={i} className="border p-3 rounded relative">
+
+<button
+onClick={()=>removeItem(section,i)}
+className="absolute top-2 right-2 text-red-500"
+>
+✕
+</button>
+
+{section.type==="reels_section" ? (
+
+item.video ? (
+<video
+src={item.video}
+className="w-full h-36 object-cover rounded mb-2"
+controls
+/>
+) : (
+<img
+src={item.thumbnail || item.productImage || item.collectionImage}
+className="w-full h-36 object-cover rounded mb-2"
+/>
+)
+
+) : (
+
+<img
+src={item.image || item.productImage || item.collectionImage}
+className="w-full h-36 object-cover rounded mb-2"
+/>
+
+)}
+
+<p className="text-xs font-semibold">
+{item.title || item.productTitle || item.collectionTitle}
+</p>
+
+</div>
+))}
 
 </div>
 )}
