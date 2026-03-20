@@ -422,8 +422,8 @@ Delete
 <div
   key={i}
   className={`border p-3 rounded relative ${
-    section.type === "banner_slider" ? ""
-  }`}
+  section.type === "banner_slider" ? "" : ""
+}`}
 >
 
 <button
