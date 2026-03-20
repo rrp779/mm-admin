@@ -391,6 +391,24 @@ className="border px-2 py-1"
 
 </select>
 
+{section.type === "collection_slider" && (
+<select
+value={section.settings?.sliderStyle || "small"}
+onChange={(e)=>updateSection(section._id,{
+settings:{
+...section.settings,
+sliderStyle:e.target.value
+}
+})}
+className="border px-2 py-1"
+>
+<option value="small">Small Slider</option>
+<option value="full">Full Width Slider</option>
+<option value="two_column">2 Column Slider</option>
+</select>
+)}
+
+
 <button
 onClick={()=>deleteSection(section._id)}
 className="text-red-500"
