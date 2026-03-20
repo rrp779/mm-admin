@@ -342,7 +342,6 @@ onChange={(e) =>
     }),
   })
 }
-})}
 />
 
 {/* BACKGROUND IMAGE */}
