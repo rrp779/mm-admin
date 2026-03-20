@@ -555,34 +555,37 @@ await updateSection(section._id,{items:updated})
 ) : (
 
 <input
-type="file"
-accept="image/*"
-className="mt-2 text-xs"
+  type="file"
+  accept="image/*"
+  className="mt-2 text-xs"
+  onChange={async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-onChange={async(e)=>{
+    const formData = new FormData();
+    formData.append("image", file);
 
-const file = e.target.files[0]
-if(!file) return
+    try {
+      const res = await fetch(`${API}/upload`, {
+        method: "POST",
+        body: formData,
+      });
 
-const formData = new FormData()
-formData.append("image",file)
+      const data = await res.json();
 
-const res = await fetch(`${API}/upload`,{
-method:"POST",
-body:formData
-})
+      const updated = [...section.items];
+      updated[i] = {
+        ...updated[i],
+        image: data.imageUrl,
+      };
 
-const data = await res.json()
+      await updateSection(section._id, { items: updated });
 
-const updated=[...section.items]
-
-updated[i].image = data.imageUrl
-
-await updateSection(section._id,{items:updated})
-
-}}
+    } catch (err) {
+      console.error("Upload failed", err);
+    }
+  }}
 />
-
 )}
 
 </div>
