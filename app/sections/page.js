@@ -317,8 +317,10 @@ await updateSection(section._id,{items:updated})
 
 <button onClick={()=>removeItem(section,i)} className="absolute top-2 right-2 bg-white px-2 py-1 text-red-500">✕</button>
 
-<img src={item.image} className="w-full h-64 object-cover rounded"/>
-
+<img
+  src={item.image || item.productImage || item.collectionImage || item.thumbnail}
+  className="w-full h-40 object-cover rounded mb-2"
+/>
 <input type="file" onChange={async(e)=>{
 const file = e.target.files[0]
 const formData = new FormData()
