@@ -386,6 +386,8 @@ className="border px-2 py-1"
 <option value="best_selling">Best Selling</option>
 <option value="trending_products">Trending</option>
 <option value="reels_section">Reels Section</option>
+<option value="two_column_grid">Two Column Grid</option>
+<option value="banner_slider">Banner Multiple</option>
 
 </select>
 
@@ -404,13 +406,21 @@ Delete
 
 {/* ITEMS */}
 
-<div className="grid grid-cols-4 gap-4">
+<div className={`grid gap-4 ${
+  section.type === "two_column_grid"
+    ? "grid-cols-2"
+    : section.type === "banner_slider"
+    ? "grid-cols-1"
+    : "grid-cols-4"
+}`}>
 
 {section.items.map((item,i)=>(
 
 <div
-key={i}
-className="border p-3 rounded relative"
+  key={i}
+  className={`border p-3 rounded relative ${
+    section.type === "banner_slider" ? "col-span-4" : ""
+  }`}
 >
 
 <button
@@ -437,8 +447,14 @@ controls
 ) : (
 
 <img
-src={item.thumbnail || item.productImage || item.collectionImage}
-className="w-full h-36 object-cover rounded mb-2"
+  src={item.image || item.productImage || item.collectionImage || item.thumbnail}
+  className={
+    section.type === "banner_slider"
+      ? "w-full h-64 object-cover rounded mb-2"
+      : section.type === "two_column_grid"
+      ? "w-full h-40 object-cover rounded mb-2"
+      : "w-full h-36 object-cover rounded mb-2"
+  }
 />
 
 )
