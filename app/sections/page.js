@@ -278,7 +278,7 @@ Delete
 {/* ================= ITEMS ================= */}
 
 {/* TWO COLUMN */}
-{section.type==="two_column_grid" && (
+
 <div className={
   section.type === "two_column_grid"
     ? "grid grid-cols-2 gap-4"
@@ -312,31 +312,64 @@ await updateSection(section._id,{items:updated})
 {/* BANNER STACK */}
 {section.type==="banner_slider" && (
 <div className="flex flex-col gap-4">
-{section.items.map((item,i)=>(
+
+{section.items.map((item,i)=>{
+
+const image = item.image || item.productImage || item.collectionImage || item.thumbnail;
+
+return (
 <div key={i} className="relative">
 
-<button onClick={()=>removeItem(section,i)} className="absolute top-2 right-2 bg-white px-2 py-1 text-red-500">✕</button>
+<button
+onClick={()=>removeItem(section,i)}
+className="absolute top-2 right-2 bg-white px-2 py-1 text-red-500"
+>
+✕
+</button>
 
 <img
-  src={item.image || item.productImage || item.collectionImage || item.thumbnail}
-  className="w-full h-40 object-cover rounded mb-2"
+src={image}
+className="w-full h-64 object-cover rounded"
 />
-<input type="file" onChange={async(e)=>{
+
+<p className="mt-2 text-sm font-semibold">
+{item.title || item.productTitle || item.collectionTitle}
+</p>
+
+<input
+type="file"
+accept="image/*"
+className="mt-2 text-xs"
+onChange={async(e)=>{
+
 const file = e.target.files[0]
+if(!file) return
+
 const formData = new FormData()
 formData.append("image",file)
-const res = await fetch(`${API}/upload`,{method:"POST",body:formData})
+
+const res = await fetch(`${API}/upload`,{
+method:"POST",
+body:formData
+})
+
 const data = await res.json()
+
 const updated=[...section.items]
-updated[i].image=data.imageUrl
+updated[i].image = data.imageUrl
+
 await updateSection(section._id,{items:updated})
-}}/>
+
+}}
+/>
 
 </div>
-))}
+)
+
+})}
+
 </div>
 )}
-
 {/* DEFAULT */}
 {section.type!=="two_column_grid" && section.type!=="banner_slider" && (
 <div className="grid grid-cols-4 gap-4">
