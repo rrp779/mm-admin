@@ -279,7 +279,13 @@ Delete
 
 {/* TWO COLUMN */}
 {section.type==="two_column_grid" && (
-<div className="grid grid-cols-2 gap-4">
+<div className={
+  section.type === "two_column_grid"
+    ? "grid grid-cols-2 gap-4"
+    : section.type === "banner_slider"
+    ? "flex flex-col gap-4"
+    : "grid grid-cols-4 gap-4"
+}>
 {section.items.map((item,i)=>(
 <div key={i} className="border p-3 rounded relative">
 
@@ -337,7 +343,16 @@ await updateSection(section._id,{items:updated})
 
 <button onClick={()=>removeItem(section,i)} className="absolute top-2 right-2 text-red-500">✕</button>
 
-<img src={item.image || item.productImage} className="w-full h-36 object-cover rounded mb-2"/>
+<img
+  src={item.image || item.productImage || item.collectionImage}
+  className={
+    section.type === "banner_slider"
+      ? "w-full h-64 object-cover rounded mb-2"
+      : section.type === "two_column_grid"
+      ? "w-full h-40 object-cover rounded mb-2"
+      : "w-full h-36 object-cover rounded mb-2"
+  }
+/>
 
 </div>
 ))}
