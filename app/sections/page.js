@@ -335,13 +335,9 @@ settings:{...section.settings,gradientStart:e.target.value}
 <input
 type="color"
 value={section.settings?.gradientEnd || ""}
-onChange={(e) =>
-  updateSection(section._id, {
-    settings: buildSafeSettings(section, {
-      sliderStyle: e.target.value,
-    }),
-  })
-}
+onChange={(e)=>updateSection(section._id,{
+settings:{...section.settings,gradientEnd:e.target.value}
+})}
 />
 
 {/* BACKGROUND IMAGE */}
@@ -394,6 +390,8 @@ className="border px-2 py-1"
 <option value="banner_slider">Banner Multiple</option>
 
 </select>
+
+{section.type === "collection_slider" && ( <select value={section.settings?.sliderStyle || "small"} onChange={(e) => updateSection(section._id, { settings: { ...section.settings, sliderStyle: e.target.value, }, }) } className="border px-2 py-1" > <option value="small">Column Slider</option> <option value="full">Full Width Slider</option> </select> )}
 
 <button
 onClick={()=>deleteSection(section._id)}
