@@ -286,26 +286,64 @@ Delete
     ? "flex flex-col gap-4"
     : "grid grid-cols-4 gap-4"
 }>
-{section.items.map((item,i)=>(
+{section.type==="two_column_grid" && (
+<div className="grid grid-cols-2 gap-4">
+
+{section.items.map((item,i)=>{
+
+const image = item.image || item.productImage || item.collectionImage || item.thumbnail;
+
+return (
 <div key={i} className="border p-3 rounded relative">
 
-<button onClick={()=>removeItem(section,i)} className="absolute top-2 right-2 text-red-500">✕</button>
+<button
+onClick={()=>removeItem(section,i)}
+className="absolute top-2 right-2 text-red-500"
+>
+✕
+</button>
 
-<img src={item.image} className="w-full h-40 object-cover rounded mb-2"/>
+<img
+src={image}
+className="w-full h-40 object-cover rounded mb-2"
+/>
 
-<input type="file" onChange={async(e)=>{
+<p className="text-xs font-semibold">
+{item.title || item.productTitle || item.collectionTitle}
+</p>
+
+<input
+type="file"
+accept="image/*"
+className="mt-2 text-xs"
+onChange={async(e)=>{
+
 const file = e.target.files[0]
+if(!file) return
+
 const formData = new FormData()
 formData.append("image",file)
-const res = await fetch(`${API}/upload`,{method:"POST",body:formData})
+
+const res = await fetch(`${API}/upload`,{
+method:"POST",
+body:formData
+})
+
 const data = await res.json()
+
 const updated=[...section.items]
-updated[i].image=data.imageUrl
+updated[i].image = data.imageUrl
+
 await updateSection(section._id,{items:updated})
-}}/>
+
+}}
+/>
 
 </div>
-))}
+)
+
+})}
+
 </div>
 )}
 
