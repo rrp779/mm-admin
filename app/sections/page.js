@@ -577,7 +577,7 @@ await updateSection(section._id,{items:updated})
 
 <input
   type="file"
-  accept="image/*,.gif
+  accept="image/*,.gif"
   className="mt-2 text-xs"
   onChange={async (e) => {
   const file = e.target.files[0];
