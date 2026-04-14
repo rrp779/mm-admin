@@ -521,8 +521,16 @@ className={
 ) : (
 
 <img
-src={item.image || item.productImage || item.collectionImage}
-className="w-full h-36 object-cover rounded mb-2"
+  src={
+    (item.image || item.productImage || item.collectionImage || item.thumbnail || "")
+      .includes(".gif")
+      ? (item.image || item.productImage || item.collectionImage || item.thumbnail) + "?tr=orig-true"
+      : (item.image || item.productImage || item.collectionImage || item.thumbnail)
+  }
+  onError={(e) => {
+    e.target.src = "https://via.placeholder.com/150";
+  }}
+  className="w-full h-36 object-cover rounded mb-2"
 />
 
 )}
