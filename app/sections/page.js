@@ -357,7 +357,7 @@ settings:{...section.settings,gradientEnd:e.target.value}
 
 <input
 type="file"
-accept="image/*"
+accept="image/*,.gif"
 
 onChange={async(e)=>{
 
